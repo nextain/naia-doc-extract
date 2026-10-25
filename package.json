@@ -1,0 +1,42 @@
+{
+  "name": "@nextain/naia-doc-extract",
+  "version": "0.1.0",
+  "description": "Read paragraphs (text + position) from HWP, HWPX, DOC, DOCX and PDF files in Node.js",
+  "license": "Apache-2.0",
+  "author": "Nextain",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nextain/naia-doc-extract.git"
+  },
+  "keywords": ["hwp", "hwpx", "hangul", "한글", "doc", "docx", "pdf", "text-extraction"],
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "LICENSE", "NOTICE", "README.md"],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "prepare": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@rhwp/core": "0.8.7",
+    "jszip": "3.10.2",
+    "unpdf": "1.8.1",
+    "word-extractor": "1.0.4"
+  },
+  "devDependencies": {
+    "@types/node": "22.13.10",
+    "typescript": "5.8.2",
+    "vitest": "3.0.7"
+  }
+}

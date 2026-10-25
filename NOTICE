@@ -1,0 +1,29 @@
+naia-doc-extract
+Copyright 2026 Nextain Inc.
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Reference (no code copied)
+--------------------------
+The approach of this module (which engines to use for legacy HWP and DOC
+files, and returning text per paragraph for AI use) was informed by the
+`packages/file-parse` package of IeumOffice (이음오피스),
+https://github.com/pblsketch/openoffice, licensed under the Apache License,
+Version 2.0. No source code from IeumOffice is included in this repository.
+We thank the IeumOffice authors for publishing their work as open source.
+
+Runtime dependencies (installed from npm, not bundled here)
+------------------------------------------------------------
+- @rhwp/core 0.8.7 — HWP/HWPX parser (Rust + WebAssembly), MIT License,
+  Copyright (c) 2025-2026 Edward Kim, https://github.com/edwardkim/rhwp
+- word-extractor 1.0.4 — Word .doc text extraction, MIT License,
+  Copyright (c) 2016-2021 Stuart Watt, https://github.com/morungos/node-word-extractor
+- unpdf 1.8.1 — PDF text extraction built on Mozilla pdf.js, MIT License,
+  Copyright (c) 2023-present Johann Schopplich, https://github.com/unjs/unpdf (pdf.js itself is Apache License 2.0)
+- jszip 3.10.2 — zip reading, used under the MIT License (dual-licensed
+  MIT OR GPL-3.0-or-later), https://github.com/Stuk/jszip
+
+Test fixtures
+-------------
+All sample documents under tests/ are made up for testing. They contain no
+real people, organisations or customer data.

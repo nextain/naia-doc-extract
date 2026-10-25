@@ -1,18 +1,49 @@
 # naia-doc-extract
 
 한글(HWP·HWPX)·워드(DOC·DOCX)·PDF 파일의 바이트를 받아 문단 글자와 그 위치를
-돌려주는 Node.js 모듈입니다. 문서를 AI 에 넘기거나 근거 문장의 위치를 보여 줄 때
+돌려주는 Node.js 모듈입니다. 문서를 AI에 넘기거나 근거 문장의 위치를 보여 줄 때
 쓰려고 만들었습니다.
 
 [English](#english)
 
+## 이음오피스와의 관계
+
+문서를 읽고 쓰고 바꾸거나 AI에 연결하는 일 전체는 [이음오피스](https://github.com/pblsketch/openoffice)를
+쓰는 것을 권합니다. 이음오피스는 명령어 `ieumoffice`, MCP 서버,
+스킬(`skills/ieumoffice/SKILL.md`)로 문서를 읽고 고치고 바꿉니다. 일부
+형식(pptx·html·md)은 가릴 부분을 `{{이름}}` 표시로 바꾸는 기능도 있습니다.
+
+이 모듈은 아래 두 가지 좁은 용도로만 씁니다.
+
+1. 이음오피스의 문서 읽기 묶음(`@genoffice/file-parse`)은 공개 배포하지 않는
+   묶음(`"private": true`)이라 다른 서버 코드에서 바로 가져다 쓸 수 없습니다.
+   이 모듈은 공개 저장소라 서버 코드에서 바로 설치해 씁니다.
+2. 이음오피스의 글자 풀기(`parseFileToText`·`hwpToText` 등)는 글자만 돌려주고
+   문단 위치는 없습니다. 이 모듈은 문단마다 위치를 함께 돌려주므로 AI 답의 근거 문장을
+   원본 자리에 표시하거나, 이름 같은 개인 정보를 제자리에서 가명으로 바꿀 때
+   씁니다.
+
+### 같이 쓰는 법
+
+사람이 문서를 열고 고치거나 AI에게 문서 작업을 시키는 곳은 이음오피스를 쓰고,
+서버가 올라온 파일에서 문단과 위치만 뽑아야 하는 곳은 이 모듈을 씁니다.
+
+| 상황 | 쓸 도구 |
+| --- | --- |
+| 문서를 읽고 고치거나 다른 형식으로 바꿀 때 (`ieumoffice`, MCP 서버, 스킬) | 이음오피스 |
+| pptx·html·md 문서에서 가릴 부분을 `{{이름}}` 표시로 바꿀 때 | 이음오피스 |
+| 서버 코드에서 올라온 파일의 문단 글자와 위치(`¶3`, `2쪽 ¶1`, 표 행·열)를 뽑을 때 | 이 모듈 (`naia-doc-extract`) |
+| AI 답의 근거 문장 위치를 표시하거나 문단 자리 기준으로 개인 정보를 가명으로 바꿀 때 | 이 모듈 (`naia-doc-extract`) |
+
+이음오피스에 문단 위치 기능을 더하는 기여([변경 내용](https://github.com/nextain/openoffice/tree/feat/file-parse-paragraph-positions))를 PR 로 보냅니다.
+받아들여지면 이 모듈은 보관(아카이브)하고 더 고치지 않으며 이음오피스를 쓸 예정입니다.
+
 ## 만든 까닭과 감사
 
 넥스테인은 [이음오피스(IeumOffice)](https://github.com/pblsketch/openoffice)의
-문서 처리 방식(`packages/file-parse`)을 참고해, 여러 서비스가 코드 수준에서 그대로
-다시 쓸 수 있도록 이 모듈을 독립 저장소로 개발했습니다. 옛 한글은 rhwp, 옛 워드는
-word-extractor 로 읽는다는 선택을 이음오피스에서 배웠습니다. 이음오피스의 코드는
-옮겨 오지 않았고, 이 저장소의 코드는 새로 작성했습니다.
+문서 처리 방식(`packages/file-parse`)을 참고해 이 저장소의 코드를 새로
+작성했습니다. 옛 한글은 rhwp, 옛 워드는 word-extractor 로 읽는다는 선택을
+이음오피스에서 배웠으며, 이음오피스의 코드는 옮겨 오지 않았습니다.
 
 문서 처리 방법을 오픈소스로 공개해 주신 이음오피스 만드신 분들께 감사드립니다.
 
@@ -115,11 +146,42 @@ Apache 2.0), jszip(MIT 또는 GPL-3.0 중 MIT 로 사용).
 `naia-doc-extract` reads paragraphs (text plus position) from HWP, HWPX, DOC,
 DOCX and PDF bytes in Node.js 22+ (ESM only; the PDF engine unpdf requires Node.js 22+).
 
-Nextain developed it as a standalone module, informed by the document-handling
+### Relationship with IeumOffice
+
+For reading, writing, converting documents, and connecting them to AI, we
+recommend [IeumOffice](https://github.com/pblsketch/openoffice). IeumOffice
+reads, edits, and converts documents via the `ieumoffice` CLI, MCP server, and
+skill (`skills/ieumoffice/SKILL.md`), and supports replacing sensitive spans with
+`{{name}}` placeholders in `pptx`, `html`, and `md` files.
+
+This module serves a narrow server-side purpose:
+
+1. IeumOffice's file-reading package (`@genoffice/file-parse`) is marked
+   `"private": true` and cannot be installed directly by external server code.
+   This repository is public and can be installed directly in server projects.
+2. IeumOffice's text extractors (`parseFileToText`, `hwpToText`, etc.) return
+   plain text without paragraph positions. This module returns each paragraph
+   with its location (`¶3`, `2쪽 ¶1`, table row/col) so servers can highlight
+   source citations or pseudonymize personal information in place.
+
+**When to use which:**
+
+- **IeumOffice**: When users open and edit documents, or when AI agents read,
+  modify, or convert documents (`ieumoffice`, MCP, skill).
+- **`naia-doc-extract`**: When a server only needs to extract paragraphs and
+  their locations from uploaded files.
+
+We are sending a contribution ([changes](https://github.com/nextain/openoffice/tree/feat/file-parse-paragraph-positions)) as a pull request to add
+paragraph location support to IeumOffice. Once accepted, this module will be archived and
+replaced by IeumOffice.
+
+### Acknowledgments
+
+Nextain wrote this module from scratch, informed by the document-handling
 approach of [IeumOffice](https://github.com/pblsketch/openoffice)
-(`packages/file-parse`), so that several services can reuse it at the code
-level. No IeumOffice code was copied. Our thanks to the IeumOffice authors for
-publishing their work as open source.
+(`packages/file-parse`), including the choice of `rhwp` for legacy HWP and
+`word-extractor` for legacy DOC. No IeumOffice code was copied. Our thanks to
+the IeumOffice authors for publishing their work as open source.
 
 ```ts
 import { extractDocument } from '@nextain/naia-doc-extract';
